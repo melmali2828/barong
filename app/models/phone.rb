@@ -37,7 +37,7 @@ class Phone < ApplicationRecord
     end
 
     def international(unsafe_phone)
-      parse(unsafe_phone).international(false)
+      sanitize(parse(unsafe_phone).international(false))
     end
 
     def find_by_number(number, attrs={})

@@ -60,7 +60,7 @@ module API
             admin_authorize! :read, User
 
             entity = params[:extended] ? API::V2::Admin::Entities::UserWithProfile : API::V2::Entities::User
-            users = API::V2::Queries::UserFilter.new(User.all.order(params[:order_by] => params[:ordering])).call(params).uniq
+            users = API::V2::Queries::UserFilter.new(User.all.order(params[:order_by] => params[:ordering])).call(params).distinct
             present paginate(users), with: entity
           end
 

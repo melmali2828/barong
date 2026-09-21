@@ -51,7 +51,7 @@ class KycService
 
       return if Barong::App.config.kyc_provider == 'local'
 
-      KYC.const_get(Barong::App.config.kyc_provider.capitalize, false)::AddressWorker.perform_async(address_params.merge(user_id: user.id, identificator: address_params[:identificator]))
+      KYC.const_get(Barong::App.config.kyc_provider.capitalize, false)::AddressWorker.perform_async(address_params.merge(user_id: user.id, identificator: address_params[:identificator]).stringify_keys)
     end
 
     def kycaid_callback(params)

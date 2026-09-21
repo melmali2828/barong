@@ -27,7 +27,7 @@ describe API::V2::Management::Documents, type: :request do
         scope: :write_documents
       }
     end
-    let!(:image) { fixture_file_upload('/files/documents_test.jpg', 'image/jpg') }
+    let!(:image) { fixture_file_upload('documents_test.jpg', 'image/jpg') }
     let(:signers) { %i[alex jeff] }
     let(:params) do
       {

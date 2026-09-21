@@ -70,7 +70,7 @@ module Barong
       end
 
       def path!(key, path)
-        unless File.exists?(path)
+        unless File.exist?(path)
           raise Error.new("#{key.to_s.upcase} path is invalid #{path.to_s}")
         end
       end

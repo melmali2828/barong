@@ -1,12 +1,11 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '~> 2.6.5'
+ruby '~> 3.4.0'
 
-gem 'aliyun-sdk',  '~> 0.7.0'
+gem 'aliyun-sdk', '~> 0.8.0'
 gem 'api-pagination', '~> 4.8.2'
 
-gem 'env-tweaks', '~> 1.0.0'
 
 # storage related gems
 gem 'carrierwave', '~> 2.1', '>= 2.1.0'
@@ -17,7 +16,7 @@ gem 'fog-aliyun', '~> 0.3.5'
 # aws support (amazon)
 gem 'fog-aws', '~> 3.5.2'
 # gcp support (google)
-gem 'fog-google', '~> 1.9.1'
+gem 'fog-google', '~> 1.19'
 
 gem 'kycaid'
 gem 'sidekiq', '>= 6.0.7'
@@ -29,7 +28,7 @@ gem 'cancancan', '~> 2.3.0'
 
 gem 'hiredis', '~> 0.6.1'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.4', '>= 5.2.4.4'
+gem 'rails', '~> 7.0.0'
 # Use mysql as the database for Active Record
 gem 'mysql2', '>= 0.4.4', '< 0.6.0'
 # Use Puma as the app server
@@ -37,7 +36,7 @@ gem 'puma', '~> 3.12', '>= 3.12.6'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
-gem 'mini_racer', platforms: :ruby
+gem 'mini_racer', '~> 0.19.0', platforms: :ruby
 
 gem 'maxmind-db', '~> 1.0'
 
@@ -94,18 +93,27 @@ end
 group :development do
   gem 'grape_on_rails_routes', '~> 0.3.2'
   gem 'web-console', '>= 3.7.0'
-  gem 'listen',       '>= 3.0.5', '< 3.2'
-  gem 'annotate', '~> 2.7', '>= 2.7.5'
+  gem 'listen', '>= 3.0.5'
+  gem 'annotate', '~> 3.2'
 end
 
 group :test do
   gem 'capybara', '>= 3.29.0'
   # gem 'selenium-webdriver'
   # gem 'chromedriver-helper'
-  gem 'rspec-rails', '~> 3.9', '>= 3.9.1'
-  gem 'shoulda-matchers', '~> 4.0.1.0'
+  gem 'rspec-rails', '~> 4.1'
+  gem 'shoulda-matchers', '~> 5.3'
   gem 'rails-controller-testing', '>= 1.0.5'
   gem 'database_cleaner', '~> 2.0.1'
 end
 
 gem "pg", "~> 1.2"
+gem 'concurrent-ruby', '< 1.3.5'
+gem 'psych', '~> 3.3.2'
+gem 'sprockets-rails'
+
+# Ruby 3.4 removed these from the default gems; they're still used by some
+# of our dependencies (factory_bot → observer, kycaid → ostruct).
+gem 'observer'
+gem 'ostruct'
+gem 'csv'

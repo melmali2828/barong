@@ -137,7 +137,7 @@ ActionMailer::Base.smtp_settings = {
   password: Barong::App.config.smtp_password
 }
 
-Barong::GeoIP.lang = Barong::App.config.geoip_lang
+Rails.application.config.to_prepare { Barong::GeoIP.lang = Barong::App.config.geoip_lang }
 
 Rails.application.config.x.keystore = kstore
 Barong::App.config.keystore = kstore
