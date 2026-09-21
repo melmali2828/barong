@@ -27,7 +27,7 @@ class APIKey < ApplicationRecord
   belongs_to :key_holder_account, polymorphic: true
 
   validates :kid, :secret, presence: true
-  validates :kid, uniqueness: true
+  validates :kid, uniqueness: { case_sensitive: true }
   validates :algorithm, inclusion: { in: ALGORITHMS }
 
   before_validation :assign_kid, if: :hmac?

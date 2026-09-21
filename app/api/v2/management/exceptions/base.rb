@@ -4,9 +4,9 @@ module API::V2
   module Management
     module Exceptions
       class Base < StandardError
-        def initialize(message:, **options)
-          @options = options
-          super(message)
+        def initialize(opts = {})
+          @options = opts
+          super(opts.fetch(:message))
         end
 
         def headers

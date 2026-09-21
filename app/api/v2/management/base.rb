@@ -14,7 +14,7 @@ module API::V2
         error!(error.message, 422)
       end
 
-      use API::V2::Management::JWTAuthenticationMiddleware
+      insert_after Grape::Middleware::Error, API::V2::Management::JWTAuthenticationMiddleware
       mount API::V2::Management::Labels
       mount API::V2::Management::Users
       mount API::V2::Management::Profiles
@@ -48,7 +48,7 @@ module API::V2
                                   API::V2::Management::Entities::Document,
                                   API::V2::Management::Entities::UserWithProfile,
                                   API::V2::Management::Entities::UserWithKYC,
-                                  API::V2::Management::Entities::APIKey,
+                                  API::V2::Entities::APIKey,
                                 ],
                                 api_version: API::V2::Base::API_VERSION,
                                 doc_version: Barong::Application::GIT_TAG,

@@ -44,7 +44,8 @@ end
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.fixture_path = "#{::Rails.root}/spec/fixtures/files"
+  config.file_fixture_path = "#{::Rails.root}/spec/fixtures/files"
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -71,4 +72,24 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 
+end
+
+# Workaround: rspec-rails' RailsFixtureFileWrapper defines neither
+# file_fixture_path nor file_fixture, but Rails 7's
+# ActionDispatch::TestProcess#fixture_file_upload needs both.
+# https://github.com/rspec/rspec-rails/pull/2385 (closed, never merged upstream)
+RSpec::Rails::FixtureFileUploadSupport::RailsFixtureFileWrapper.class_eval do
+  def file_fixture_path
+    Rails.root.join('spec', 'fixtures', 'files')
+  end
+
+  def file_fixture(name)
+    file_fixture_path.join(name)
+  end
+end
+
+RSpec::Rails::FixtureFileUploadSupport::RailsFixtureFileWrapper.singleton_class.class_eval do
+  def file_fixture_path
+    Rails.root.join('spec', 'fixtures', 'files')
+  end
 end

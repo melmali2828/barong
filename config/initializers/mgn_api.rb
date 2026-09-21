@@ -29,5 +29,7 @@ yaml = ERB.new(raw_file).result
     end
   end
 
-  API::V2::Management::JWTAuthenticationMiddleware.security_configuration = x
+  Rails.application.config.to_prepare do
+    API::V2::Management::JWTAuthenticationMiddleware.security_configuration = x
+  end
 end

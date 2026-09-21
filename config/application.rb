@@ -10,7 +10,8 @@ Bundler.require(*Rails.groups)
 module Barong
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.2
+    config.load_defaults 7.0
+
 
     # Configure Sentry as early as possible.
     if ENV["BARONG_SENTRY_DSN_BACKEND"].present?
@@ -20,8 +21,6 @@ module Barong
 
     # Adding Grape API
     # Eager loading all app/ folder
-    config.eager_load_paths += Dir[Rails.root.join('app')]
-    config.eager_load_paths += Dir[Rails.root.join('lib/barong')]
 
     # Setup the logger
     config.logger = Logger.new(STDOUT)

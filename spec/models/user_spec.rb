@@ -135,7 +135,7 @@ RSpec.describe User, type: :model do
     it { should allow_value('Kal31ewwqXrew').for(:password)}
   end
 
-  let(:uploaded_file) { fixture_file_upload('/files/documents_test.jpg', 'image/jpg') }
+  let(:uploaded_file) { fixture_file_upload('documents_test.jpg', 'image/jpg') }
 
   context 'User with 2 or more documents' do
     it do
