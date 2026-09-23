@@ -1,4 +1,4 @@
-FROM ruby:2.6.6
+FROM ruby:3.4.1
 
 # By default image is built using RAILS_ENV=production.
 # You may want to customize it:
@@ -42,8 +42,9 @@ USER app
 COPY --chown=app:app Gemfile Gemfile.lock $APP_HOME/
 
 # Install dependencies
-RUN gem update bundler
-RUN bundle install --jobs=$(nproc) --system --binstubs --without development test
+RUN gem install bundler -v 2.5.23 --no-document
+ENV BUNDLE_WITHOUT=development:test BUNDLE_FROZEN=true
+RUN bundle install --jobs=$(nproc)
 
 # Copy the main application.
 COPY --chown=app:app . $APP_HOME
@@ -56,8 +57,10 @@ RUN wget -O ${APP_HOME}/geolite.tar.gz ${MAXMINDDB_LINK} \
 ENV BARONG_MAXMINDDB_PATH=${APP_HOME}/geolite/GeoLite2-Country.mmdb
 
 # Download list of Cloudflare IP Ranges (v4 and v6)
-RUN curl https://www.cloudflare.com/ips-v4 >> ${APP_HOME}/config/cloudflare_ips.yml \
-    && curl https://www.cloudflare.com/ips-v6 >> ${APP_HOME}/config/cloudflare_ips.yml
+# Overwrite (not append) and force a newline between the lists: ips-v4 has no
+# trailing newline, so appending glued the last v4 range to the first v6 range.
+RUN { curl -fsS https://www.cloudflare.com/ips-v4; echo; \
+      curl -fsS https://www.cloudflare.com/ips-v6; echo; } > ${APP_HOME}/config/cloudflare_ips.yml
 
 # Initialize application configuration & assets.
 RUN ./bin/init_config \

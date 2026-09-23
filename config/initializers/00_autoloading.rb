@@ -34,17 +34,3 @@ module API; end
 Rails.autoloaders.main.push_dir("#{Rails.root}/app/api", namespace: API)
 ActiveSupport::Dependencies.autoload_paths.delete("#{Rails.root}/app/api")
 
-# --- ENV.true? helper ------------------------------------------------------
-# Previously provided by the `env-tweaks` gem, which we dropped because it was
-# abandoned (last release 2020) and pinned activesupport to < 7.0.
-# Used by config/environments/production.rb and spec/api/v2/cors/cors_spec.rb.
-module EnvTrueHelper
-  def true?(key)
-    %w[true 1 yes on].include?(self[key].to_s.strip.downcase)
-  end
-
-  def false?(key)
-    !true?(key)
-  end
-end
-ENV.singleton_class.prepend(EnvTrueHelper)

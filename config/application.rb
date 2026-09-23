@@ -7,8 +7,30 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Defined here, not in an initializer: config/environments/*.rb run
+# before config/initializers/*, and production.rb calls ENV.true?.
+# --- ENV.true? helper ------------------------------------------------------
+# Previously provided by the `env-tweaks` gem, which we dropped because it was
+# abandoned (last release 2020) and pinned activesupport to < 7.0.
+# Used by config/environments/production.rb and spec/api/v2/cors/cors_spec.rb.
+module EnvTrueHelper
+  def true?(key)
+    %w[true 1 yes on].include?(self[key].to_s.strip.downcase)
+  end
+
+  def false?(key)
+    !true?(key)
+  end
+end
+ENV.singleton_class.prepend(EnvTrueHelper)
+
+# production.rb uses JSONLogFormatter before autoloading is available,
+# so load it explicitly and keep Zeitwerk away from it (see ignore below).
+require_relative '../lib/barong/json_log_formatter'
+
 module Barong
   class Application < Rails::Application
+    Rails.autoloaders.main.ignore(File.expand_path('../lib/barong/json_log_formatter.rb', __dir__))
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
 
