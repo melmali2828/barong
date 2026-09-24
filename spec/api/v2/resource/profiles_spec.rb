@@ -271,7 +271,7 @@ describe 'API::V2::Resource::Profiles' do
     end
 
     it 'creates new profile with only required fields without masking' do
-      Barong::App.config.stub(:api_data_masking_enabled).and_return(false)
+      allow(Barong::App.config).to receive(:api_data_masking_enabled).and_return(false)
       expect { post url, params: request_params, headers: auth_header }
         .to change { Profile.count }.by (1)
       expect(response.status).to eq(201)

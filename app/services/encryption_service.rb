@@ -39,7 +39,10 @@ class EncryptionService
   private
 
   def self.encryptor(key)
-    ActiveSupport::MessageEncryptor.new(key)
+    # Serializer pinned explicitly: the on-disk format of encrypted KYC fields
+    # must not follow Rails defaults (load_defaults 7.1 switches the default to
+    # JSON, which turns Profile#dob from Date into String).
+    ActiveSupport::MessageEncryptor.new(key, serializer: Marshal)
   end
 
   def self.get_master_key(salt)

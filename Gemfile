@@ -21,14 +21,14 @@ gem 'fog-google', '~> 1.19'
 gem 'kycaid'
 gem 'sidekiq', '>= 6.0.7'
 # GLI
-gem 'gli', '~> 2.19.0'
+gem 'gli', '~> 2.22'
 ##
 ## abilities and permissions for admin API module
 gem 'cancancan', '~> 2.3.0'
 
 gem 'hiredis', '~> 0.6.1'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 7.0.0'
+gem 'rails', '~> 7.1.0'
 # Use mysql as the database for Active Record
 gem 'mysql2', '>= 0.4.4', '< 0.6.0'
 # Use Puma as the app server

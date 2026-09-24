@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
-require_dependency 'v2/validations'
-require_dependency 'v2/exception_handlers'
+# Load custom Grape validators / handlers before the endpoints are defined.
+# Referencing the constants lets Zeitwerk load them; `require_dependency 'v2/...'`
+# relied on app/api being in $LOAD_PATH, which Rails 7.1 defaults no longer do.
+API::V2::Validations
+API::V2::ExceptionHandlers
 
 module API::V2
   # Base api configuration for V2 module

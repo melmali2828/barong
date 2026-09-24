@@ -34,7 +34,7 @@ describe 'Api::V2::Resources::Phones' do
 
       context 'list of users phone without masking' do
         before do
-          Barong::App.config.stub(:api_data_masking_enabled).and_return(false)
+          allow(Barong::App.config).to receive(:api_data_masking_enabled).and_return(false)
         end
 
         it 'returns list of user\'s phones' do

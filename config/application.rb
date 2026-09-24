@@ -32,7 +32,7 @@ module Barong
   class Application < Rails::Application
     Rails.autoloaders.main.ignore(File.expand_path('../lib/barong/json_log_formatter.rb', __dir__))
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
+    config.load_defaults 7.1
 
 
     # Configure Sentry as early as possible.
@@ -48,7 +48,9 @@ module Barong
     config.logger = Logger.new(STDOUT)
 
     # Load lib folder files to be visible in specs
-    config.paths.add 'lib', eager_load: false, autoload: true
+    # load_path: true keeps `require 'barong/...'` working; Rails 7.1 no longer
+    # adds autoload paths to $LOAD_PATH (add_autoload_paths_to_load_path = false).
+    config.paths.add 'lib', eager_load: false, autoload: true, load_path: true
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers

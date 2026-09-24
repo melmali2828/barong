@@ -34,7 +34,7 @@ describe Barong::RedisSession do
       expect(Rails.cache.read(key)).to eq encrypted_value
 
       res = Barong::RedisSession.delete(user.uid, session_id)
-      expect(res).to eq 1
+      expect(res).to eq true
 
       expect(Rails.cache.read(key)).to eq nil
     end
@@ -65,9 +65,9 @@ describe Barong::RedisSession do
 
     context 'without session id' do
       it 'should invalidate all sessions' do
-        expect(Rails.cache.redis.keys.length).to eq 5
+        expect(Rails.cache.redis.with(&:keys).length).to eq 5
         Barong::RedisSession.invalidate_all(user.uid)
-        expect(Rails.cache.redis.keys).to eq []
+        expect(Rails.cache.redis.with(&:keys)).to eq []
       end
     end
 
@@ -76,9 +76,9 @@ describe Barong::RedisSession do
         sid = SecureRandom.hex(16)
         Barong::RedisSession.add(user.uid, sid, 60)
 
-        expect(Rails.cache.redis.keys.length).to eq 6
+        expect(Rails.cache.redis.with(&:keys).length).to eq 6
         Barong::RedisSession.invalidate_all(user.uid, sid)
-        expect(Rails.cache.redis.keys.length).to eq 1
+        expect(Rails.cache.redis.with(&:keys).length).to eq 1
       end
     end
   end

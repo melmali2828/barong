@@ -32,7 +32,7 @@ module Barong
 
     def self.invalidate_all(user_uid, session_id = nil)
       # Get list of active user sessions
-      session_keys = Rails.cache.redis.keys("#{user_uid}_session_*")
+      session_keys = Rails.cache.redis.with { |r| r.keys("#{user_uid}_session_*") }
 
       # Delete user sessions from native session list
       # If session ID present

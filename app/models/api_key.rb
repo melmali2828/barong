@@ -22,7 +22,7 @@ class APIKey < ApplicationRecord
 
   vault_attribute :secret
 
-  serialize :scope, Array
+  serialize :scope, type: Array, coder: YAML
 
   belongs_to :key_holder_account, polymorphic: true
 

@@ -232,7 +232,7 @@ describe 'Documents API test' do
 
     context 'without masking' do
       before do
-        Barong::App.config.stub(:api_data_masking_enabled).and_return(false)
+        allow(Barong::App.config).to receive(:api_data_masking_enabled).and_return(false)
       end
 
       it 'Returns user all his documents' do

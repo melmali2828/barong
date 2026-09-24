@@ -19,3 +19,5 @@ config/charts
 # Test runs generate a throwaway JWT key pair here; never ship a private key
 /config/rsa-key
 /config/rsa-key.pub
+# CarrierWave (file storage) writes test/dev uploads here; never ship them
+/public/uploads
