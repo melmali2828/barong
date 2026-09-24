@@ -19,7 +19,7 @@ module API
                      desc: 'If set, returned labels sorted in specific order, default to "asc".'
           end
           get do
-            labels = current_user.labels.order(created_at: params[:ordering])
+            labels = current_user.labels.order(created_at: params[:ordering], id: params[:ordering])
             present labels, with: Entities::Label
           end
 
