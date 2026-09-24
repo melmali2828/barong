@@ -29,4 +29,5 @@
 /config/rsa-key.pub
 /config/rsa-key
 
-.idea/.upgrade-backups/
+.idea/
+.upgrade-backups/

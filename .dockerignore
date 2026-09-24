@@ -8,3 +8,14 @@ README.md
 .travis.yml
 VERSION
 config/charts
+# Local/test artifacts that must not end up in the image
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/.keep
+/spec/
+/.upgrade-backups/
+/full_run_*.txt
+# Test runs generate a throwaway JWT key pair here; never ship a private key
+/config/rsa-key
+/config/rsa-key.pub
