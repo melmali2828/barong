@@ -40,7 +40,16 @@ class User < ApplicationRecord
   end
 
   def generate_password
-    self.password = SecureRandom.base64(30) unless password
+    return if password
+  
+    # A random base64 string can miss a character class the password policy
+    # requires (~0.16% with the default regexp: no digit), which made
+    # User.create! fail for auto-created users (auth0 first login -> 422).
+    # Retry until the configured policy accepts it.
+    10.times do
+      self.password = SecureRandom.base64(30)
+      break if PasswordStrengthChecker.validate!(password) == 'strong'
+    end
   end
 
   def validate_pass!
