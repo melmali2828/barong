@@ -2,7 +2,11 @@
 
 module Barong
   class App
-    include ActiveSupport::Configurable
+    # Rails 8.1 deprecates ActiveSupport::Configurable; we only use `config`
+    # as a key/value store, which OrderedOptions provides directly.
+    def self.config
+      @config ||= ActiveSupport::OrderedOptions.new
+    end
 
     class Error < ::StandardError; end
 

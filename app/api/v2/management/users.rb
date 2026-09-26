@@ -56,11 +56,11 @@ module API::V2
           present user, with: API::V2::Management::Entities::UserWithKYC
         end
 
-        desc 'Returns array of users as collection',
-        security: [{ "BearerToken": [] }],
-        failure: [
-          { code: 401, message: 'Invalid bearer token' }
-        ] do
+        desc 'Returns array of users as collection' do
+          security [{ "BearerToken": [] }]
+          failure [
+            { code: 401, message: 'Invalid bearer token' }
+          ]
           @settings[:scope] = :read_users
           success API::V2::Entities::User
         end
