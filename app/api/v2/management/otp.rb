@@ -14,15 +14,13 @@ module API
 
         desc 'OTP related routes'
         resource :otp do
-          desc 'Sign request with barong signature' do
-            @settings[:scope] = :otp_sign
-          end
+          desc 'Sign request with barong signature'
           params do
             requires :user_uid, type: String, allow_blank: false, desc: 'Account UID'
             requires :otp_code, type: String, allow_blank: false, desc: 'Code from Google Authenticator'
             requires :jwt, type: Hash, allow_blank: false, desc: 'RFC 7516 jwt with applogic signature'
           end
-          post '/sign' do
+          post '/sign', scope: :otp_sign do
             declared_params = declared(params)
             user = User.active.find_by!(uid: declared_params[:user_uid])
             error!('Account has not enabled 2FA', 422) unless user.otp

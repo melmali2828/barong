@@ -14,13 +14,12 @@ module API::V2
       resource :phones do
 
         desc 'Get user phone numbers' do
-          @settings[:scope] = :read_phones
           success API::V2::Management::Entities::Phone
         end
         params do
           requires :uid, type: String, desc: 'User uid', allow_blank: false
         end
-        post '/get' do
+        post '/get', scope: :read_phones do
           user = User.find_by(uid: params[:uid])
           error!('user.doesnt_exist', 422) unless user
 
@@ -28,14 +27,13 @@ module API::V2
         end
 
         desc 'Create phone number for user' do
-          @settings[:scope] = :write_phones
           success API::V2::Management::Entities::Phone
         end
         params do
           requires :uid, type: String, desc: 'User uid', allow_blank: false
           requires :number, type: String, desc: 'User phone number', allow_blank: false
         end
-        post do
+        post scope: :write_phones do
           user = User.find_by(uid: params[:uid])
           error!('user.doesnt_exist', 422) unless user
 
@@ -51,14 +49,13 @@ module API::V2
         end
 
         desc 'Delete phone number for user' do
-          @settings[:scope] = :write_phones
           success API::V2::Management::Entities::Phone
         end
         params do
           requires :uid, type: String, desc: 'User uid', allow_blank: false
           requires :number, type: String, desc: 'User phone number', allow_blank: false
         end
-        post '/delete' do
+        post '/delete', scope: :write_phones do
           user = User.find_by(uid: params[:uid])
           error!('user.doesnt_exist', 422) unless user
 

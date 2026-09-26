@@ -14,7 +14,6 @@ module API::V2
         end
 
         desc 'Imports a profile for user' do
-          @settings[:scope] = :write_users
           success API::V2::Management::Entities::UserWithProfile
         end
 
@@ -31,7 +30,7 @@ module API::V2
           optional :metadata, type: String, desc: 'Metadata', allow_blank: false
         end
 
-        post do
+        post scope: :write_users do
           user = User.find_by(uid: params[:uid])
           error! 'user.doesnt_exist', 422 unless user
 

@@ -10,7 +10,6 @@ module API::V2
       resource :service_accounts do
 
         desc 'Get specific service_account information' do
-          @settings[:scope] = :read_service_accounts
           success API::V2::Entities::ServiceAccounts
         end
         params do
@@ -18,7 +17,7 @@ module API::V2
           optional :email, type: String, allow_blank: false, desc: 'service_account email'
           exactly_one_of :uid, :email
         end
-        post '/get' do
+        post '/get', scope: :read_service_accounts do
           declared_params = declared(params, include_missing: false)
 
           service_acc = ServiceAccount.find_by!(declared_params)
@@ -29,7 +28,6 @@ module API::V2
         end
 
         desc 'Get service_accounts as a paginated collection' do
-          @settings[:scope] = :read_service_accounts
           success API::V2::Entities::ServiceAccounts
         end
         params do
@@ -37,7 +35,7 @@ module API::V2
           optional :owner_uid, type: String, allow_blank: false, desc: 'owner uid'
           optional :owner_email, type: String, allow_blank: false, desc: 'owner email'
         end
-        post '/list' do
+        post '/list', scope: :read_service_accounts do
           owner = User.find_by(uid: params[:owner_uid]) || User.find_by(email: params[:owner_email]) if params[:owner_uid] || params[:owner_email]
           service_accs = owner ? owner.service_accounts : ServiceAccount.all
 
@@ -46,7 +44,6 @@ module API::V2
         end
 
         desc 'Create service_account' do
-          @settings[:scope] = :write_service_accounts
           success API::V2::Entities::ServiceAccounts
         end
         params do
@@ -58,7 +55,7 @@ module API::V2
           optional :service_account_level, type: Integer, desc: 'service_account level'
         end
 
-        post '/create' do
+        post '/create', scope: :write_service_accounts do
           owner = User.find_by(uid: params[:owner_uid])
 
           s_params = {
@@ -77,14 +74,13 @@ module API::V2
         end
 
         desc 'Update service_account' do
-          @settings[:scope] = :write_service_accounts
           success API::V2::Entities::ServiceAccounts
         end
         params do
           requires :uid, type: String, allow_blank: false, desc: 'service_account uid'
           optional :owner_uid, type: String, allow_blank: false, desc: 'service_account owner uid'
         end
-        post '/update' do
+        post '/update', scope: :write_service_accounts do
           service_acc = ServiceAccount.find_by(uid: params[:uid])
           error!('Service account doesnt exist', 422) unless service_acc
 
@@ -96,13 +92,12 @@ module API::V2
         end
 
         desc 'Delete specific service_account' do
-          @settings[:scope] = :write_service_accounts
           success API::V2::Entities::ServiceAccounts
         end
         params do
           requires :uid, type: String, allow_blank: false, desc: 'service_account uid'
         end
-        post '/delete' do
+        post '/delete', scope: :write_service_accounts do
           declared_params = declared(params, include_missing: false)
 
           service_acc = ServiceAccount.find_by!(declared_params)

@@ -34,7 +34,6 @@ module API::V2
       desc 'Users related routes'
       resource :users do
         desc 'Get users and profile information' do
-          @settings[:scope] = :read_users
           success API::V2::Management::Entities::UserWithKYC
         end
         params do
@@ -43,7 +42,7 @@ module API::V2
           optional :phone_num, type: String, allow_blank: false, desc: 'User phone number'
           exactly_one_of :uid, :email, :phone_num
         end
-        post '/get' do
+        post '/get', scope: :read_users do
           declared_params = declared(params, include_missing: false)
 
           if declared_params.key?(:phone_num)
@@ -61,7 +60,6 @@ module API::V2
           failure [
             { code: 401, message: 'Invalid bearer token' }
           ]
-          @settings[:scope] = :read_users
           success API::V2::Entities::User
         end
         params do
@@ -76,7 +74,7 @@ module API::V2
           use :timeperiod_filters
           use :pagination_filters
         end
-        post '/list' do
+        post '/list', scope: :read_users do
           entity = params[:extended] ? API::V2::Management::Entities::UserWithProfile : API::V2::Entities::User
           users = API::V2::Queries::UserFilter.new(User.all).call(params)
           users.tap { |q| present paginate(q), with: entity }
@@ -84,7 +82,6 @@ module API::V2
         end
 
         desc 'Creates new user' do
-          @settings[:scope] = :write_users
           success API::V2::Management::Entities::UserWithProfile
         end
         params do
@@ -92,7 +89,7 @@ module API::V2
           requires :password, type: String, desc: 'User Password', allow_blank: false
           optional :referral_uid, type: String, desc: 'Referral uid', allow_blank: false
         end
-        post do
+        post scope: :write_users do
           referral = User.find_by_uid(params[:referral_uid]).id if params[:referral_uid]
 
           user = User.create({ email: params[:email], password: params[:password], referral_id: referral }.compact )
@@ -102,7 +99,6 @@ module API::V2
         end
 
         desc 'Updates role and data fields of existing user' do
-          @settings[:scope] = :write_users
           success API::V2::Management::Entities::UserWithProfile
         end
         params do
@@ -111,7 +107,7 @@ module API::V2
           optional :data, type: String, desc: 'Any additional key:value pairs in json format', allow_blank: false
           at_least_one_of :role, :data
         end
-        post '/update' do
+        post '/update', scope: :write_users do
           user = User.find_by_uid(params[:uid])
           error! 'user.doesnt_exist', 422 unless user
 
@@ -122,7 +118,6 @@ module API::V2
         end
 
         desc 'Imports an existing user' do
-          @settings[:scope] = :write_users
           success API::V2::Management::Entities::UserWithProfile
         end
         params do
@@ -143,7 +138,7 @@ module API::V2
           optional :country, type: String, allow_blank: false, desc: 'Country'
           optional :state, type: String, allow_blank: false, desc: 'State'
         end
-        post '/import' do
+        post '/import', scope: :write_users do
           if User.find_by(email: params[:email]).present?
             error! 'User already exists by this email', 422
           end

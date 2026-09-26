@@ -5,7 +5,6 @@ module API::V2
     class APIKeys < Grape::API
       resource :api_keys do
         desc 'Create an api key for service account' do
-          @settings[:scope] = :write_apikeys
           success API::V2::Entities::APIKey
         end
         params do
@@ -22,7 +21,7 @@ module API::V2
                    allow_blank: false,
                    desc: 'Comma separated scopes'
         end
-        post do
+        post scope: :write_apikeys do
           if params[:uid].start_with?(Barong::App.config.uid_prefix)
             error!({ error: 'disabled_management_endpoint' }, 422) unless Barong::App.config.mgn_api_keys_user
 
@@ -57,7 +56,6 @@ module API::V2
         end
 
         desc 'Updates an api key for service account' do
-          @settings[:scope] = :write_apikeys
           success API::V2::Entities::APIKey
         end
         params do
@@ -78,7 +76,7 @@ module API::V2
                    allow_blank: false,
                    desc: 'State of API Key. "active" state means key is active and can be used for auth'
         end
-        post '/update' do
+        post '/update', scope: :write_apikeys do
           if params[:uid].start_with?(Barong::App.config.uid_prefix)
             error!({ error: 'disabled_management_endpoint' }, 422) unless Barong::App.config.mgn_api_keys_user
 
