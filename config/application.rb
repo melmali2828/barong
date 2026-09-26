@@ -3,6 +3,10 @@
 require_relative 'boot'
 require 'rails/all'
 
+# grape 1.8 requires active_support/configurable (deprecated in Rails 8.1, removed in 8.2). Preload it silently;
+# remove together with the grape >= 3.0 upgrade (8.2 blocker).
+ActiveSupport.deprecator.silence { require 'active_support/configurable' }
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -32,7 +36,7 @@ module Barong
   class Application < Rails::Application
     Rails.autoloaders.main.ignore(File.expand_path('../lib/barong/json_log_formatter.rb', __dir__))
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 8.0
+    config.load_defaults 8.1
     # Deliberate override of the 7.2 default (same as Peatio): YJIT's memory
     # cost is unmeasured; enable later with RUBY_YJIT_ENABLE=1 after measuring.
     config.yjit = false
