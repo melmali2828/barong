@@ -94,14 +94,13 @@ group :development do
   gem 'grape_on_rails_routes', '~> 0.3.2'
   gem 'web-console', '>= 3.7.0'
   gem 'listen', '>= 3.0.5'
-  gem 'annotate', '~> 3.2'
 end
 
 group :test do
   gem 'capybara', '>= 3.29.0'
   # gem 'selenium-webdriver'
   # gem 'chromedriver-helper'
-  gem 'rspec-rails', '~> 7.1'
+  gem 'rspec-rails', '~> 8.0'
   gem 'shoulda-matchers', '~> 5.3'
   gem 'rails-controller-testing', '>= 1.0.5'
   gem 'database_cleaner', '~> 2.0.1'
