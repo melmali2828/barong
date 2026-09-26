@@ -32,7 +32,7 @@ module Barong
   class Application < Rails::Application
     Rails.autoloaders.main.ignore(File.expand_path('../lib/barong/json_log_formatter.rb', __dir__))
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.2
+    config.load_defaults 8.0
     # Deliberate override of the 7.2 default (same as Peatio): YJIT's memory
     # cost is unmeasured; enable later with RUBY_YJIT_ENABLE=1 after measuring.
     config.yjit = false
