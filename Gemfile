@@ -8,7 +8,7 @@ gem 'api-pagination', '~> 4.8.2'
 
 
 # storage related gems
-gem 'carrierwave', '~> 2.1', '>= 2.1.0'
+gem 'carrierwave', '~> 3.1', '>= 3.1.4'
 # fog's core, shared behaviors without API and provider specifics
 gem 'fog-core', '~> 2.1.0'
 # alicloud support
