@@ -11,12 +11,15 @@ module API
         # default_message => "account.withdraw.missing_otp"
         def message(_param)
           api = @scope.instance_variable_get(:@api)
+          # grape-swagger doc APIs are anonymous Grape::API::Instance classes (no base)
+          return super unless api.base&.name
+
           module_name = api.base.module_parent.name.humanize.demodulize
           class_name = api.base.name.humanize.demodulize.singularize
           # Return default API error message for Management module (no errors unify).
           return super if module_name == 'management'
 
-          options_key?(:message) ? @option[:message] : default_exception(module_name, class_name)
+          options_key?(:message) ? @options[:message] : default_exception(module_name, class_name)
         end
 
         def default_exception(module_name, class_name)
@@ -32,12 +35,15 @@ module API
 
         def message(_param)
           api = @scope.instance_variable_get(:@api)
+          # grape-swagger doc APIs are anonymous Grape::API::Instance classes (no base)
+          return super unless api.base&.name
+
           module_name = api.base.module_parent.name.humanize.demodulize
           class_name = api.base.name.humanize.demodulize.singularize
           # Return default API error message for Management module (no errors unify).
           return super if module_name == 'management'
 
-          options_key?(:message) ? @option[:message] : default_exception(module_name, class_name)
+          options_key?(:message) ? @options[:message] : default_exception(module_name, class_name)
         end
 
         def default_exception(module_name, class_name)
@@ -49,15 +55,13 @@ module API
       class Range < Grape::Validations::Validators::Base
         def initialize(*)
           super
-          @range = @option
+          @range = @options
         end
 
         def validate_param!(attr, params)
           return unless (params[attr] || @required) && !@range.cover?(params[attr])
 
-          raise Grape::Exceptions::Validation, \
-            params:  [@scope.full_name(attr)],
-            message: "must be in range: #{@range}."
+          validation_error!(attr, "must be in range: #{@range}.")
         end
       end
 
@@ -67,9 +71,7 @@ module API
           return unless params.key?(name)
           return if params[name].to_s.to_i.positive?
 
-          raise Grape::Exceptions::Validation,
-              params:  [@scope.full_name(name)],
-              message: "#{name} must be greater than zero."
+          validation_error!(name, "#{name} must be greater than zero.")
         end
       end
     end

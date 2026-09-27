@@ -3,10 +3,6 @@
 require_relative 'boot'
 require 'rails/all'
 
-# grape 1.8 requires active_support/configurable (deprecated in Rails 8.1, removed in 8.2). Preload it silently;
-# remove together with the grape >= 3.0 upgrade (8.2 blocker).
-ActiveSupport.deprecator.silence { require 'active_support/configurable' }
-
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
