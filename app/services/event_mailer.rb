@@ -130,13 +130,17 @@ class EventMailer
     Rails.logger.info { "User #{user.email} has '#{language}' email language" }
     template_config = config[:templates].transform_keys(&:downcase)
 
+    # Skipped messages are acknowledged too: otherwise they stay unacked on the
+    # channel and are redelivered on every restart until their JWT expires.
     unless template_config.keys.include?(language)
       Rails.logger.error { "Language #{language} is not supported. Skipping." }
+      @bunny_channel.ack(delivery_info.delivery_tag)
       return
     end
 
     if config[:expression].present? && skip_event(event, config[:expression])
       Rails.logger.info { "Event #{obj.name} skipped" }
+      @bunny_channel.ack(delivery_info.delivery_tag)
       return
     end
 
@@ -178,12 +182,15 @@ class EventMailer
   def skip_event(event, expression)
     # valid operators: and / or / not
     operator = expression.keys.first.downcase
-    # { field_name: field_value }
+    # { field_name: field_value } or { field_name: [value1, value2] }
     values = expression[operator]
 
-    # return array of boolean [false, true]
+    # return array of boolean [false, true];
+    # an array value matches when the event value is one of its elements
     res = values.keys.map do |field_name|
-      safe_dig(event, field_name.to_s.split('.')) == values[field_name]
+      expected = values[field_name]
+      actual = safe_dig(event, field_name.to_s.split('.'))
+      expected.is_a?(Array) ? expected.include?(actual) : actual == expected
     end
 
     # all? works as AND operator, any? works as OR operator

@@ -93,5 +93,104 @@ describe EventMailer do
         expect(event_mailer.send(:skip_event, event, expression)).to eq false
       end
     end
+
+    context 'array value' do
+      let(:withdraw) { { record: { state: 'accepted', currency: 'usd' } } }
+
+      it 'should not skip event when the value is in the list (AND)' do
+        expression = { and: { 'record.state': %w[accepted succeed rejected] } }
+        expect(event_mailer.send(:skip_event, withdraw, expression)).to eq false
+      end
+
+      it 'should skip event when the value is not in the list (AND)' do
+        expression = { and: { 'record.state': %w[succeed rejected] } }
+        expect(event_mailer.send(:skip_event, withdraw, expression)).to eq true
+      end
+
+      it 'should combine array and scalar values (AND)' do
+        expression = { and: { 'record.state': %w[accepted succeed], 'record.currency': 'btc' } }
+        expect(event_mailer.send(:skip_event, withdraw, expression)).to eq true
+      end
+
+      it 'should not skip event when one value matches (OR)' do
+        expression = { or: { 'record.state': %w[failed], 'record.currency': %w[usd try] } }
+        expect(event_mailer.send(:skip_event, withdraw, expression)).to eq false
+      end
+
+      it 'should skip event when the value is in the list (NOT)' do
+        expression = { not: { 'record.state': %w[processing accepted] } }
+        expect(event_mailer.send(:skip_event, withdraw, expression)).to eq true
+      end
+
+      it 'should not skip event when the value is not in the list (NOT)' do
+        expression = { not: { 'record.state': %w[processing confirming] } }
+        expect(event_mailer.send(:skip_event, withdraw, expression)).to eq false
+      end
+    end
+  end
+
+  describe '#handle_message' do
+    let!(:create_member_permission) { create :permission, role: 'member' }
+    let(:user) { create(:user) }
+    let(:events) {
+      [{ name: 'Label Created', key: 'label.created', exchange: 'barong_model',
+         expression: { and: { 'record.key': 'phone' } },
+         templates: { en: { subject: 'Phone verified', template_path: 'label.en.html.erb' } } }]
+    }
+    let(:exchanges) { { barong_model: { name: 'barong.events.model', signer: 'barong' } } }
+    let(:mailer) { EventMailer.new(events, exchanges, {}) }
+    let(:channel) { double('channel', ack: true, reject: true) }
+    let(:delivery_info) { OpenStruct.new(exchange: 'barong.events.model', routing_key: 'label.created', delivery_tag: 42) }
+    let(:label_key) { 'phone' }
+    let(:payload) {
+      { verified: [:barong],
+        payload: { event: { name: 'model.label.created', record: { key: label_key, user: { uid: user.uid } } } } }
+    }
+
+    before do
+      mailer.instance_variable_set(:@bunny_channel, channel)
+      allow(mailer).to receive(:verify_jwt).and_return(payload)
+    end
+
+    # EventMailer#initialize registers Kernel.at_exit { unlisten }
+    after { mailer.instance_variable_set(:@bunny_channel, nil) }
+
+    it 'delivers the email and acknowledges the message' do
+      expect(Postmaster).to receive(:process_payload).and_return(double(deliver_now: true))
+      mailer.send(:handle_message, delivery_info, {}, 'jwt')
+      expect(channel).to have_received(:ack).with(42).once
+      expect(channel).not_to have_received(:reject)
+    end
+
+    context 'event filtered out by the expression' do
+      let(:label_key) { 'email' }
+
+      it 'acknowledges the message without delivering' do
+        expect(Postmaster).not_to receive(:process_payload)
+        mailer.send(:handle_message, delivery_info, {}, 'jwt')
+        expect(channel).to have_received(:ack).with(42).once
+        expect(channel).not_to have_received(:reject)
+      end
+    end
+
+    context 'unsupported user language' do
+      let(:user) { create(:user, data: { language: 'de' }.to_json) }
+
+      it 'acknowledges the message without delivering' do
+        expect(Postmaster).not_to receive(:process_payload)
+        mailer.send(:handle_message, delivery_info, {}, 'jwt')
+        expect(channel).to have_received(:ack).with(42).once
+        expect(channel).not_to have_received(:reject)
+      end
+    end
+
+    context 'delivery error' do
+      it 'rejects the message (dead letter -> retry queue)' do
+        expect(Postmaster).to receive(:process_payload).and_raise(StandardError, 'smtp down')
+        mailer.send(:handle_message, delivery_info, {}, 'jwt')
+        expect(channel).to have_received(:reject).with(42).once
+        expect(channel).not_to have_received(:ack)
+      end
+    end
   end
 end
